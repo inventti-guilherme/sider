@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using Sider.Serialization;
@@ -53,7 +54,7 @@ namespace Sider
     [Obsolete("Please use EncodingOverride instead.")]
     public Encoding ValueEncoding { get; private set; }
 
-    public ISerializer SerializerOverride { get; private set; }
+    public Dictionary<Type, ISerializer> SerializerOverride { get; private set; }
     public CultureInfo CultureOverride { get; private set; }
     public Encoding EncodingOverride { get; private set; }
 
@@ -268,10 +269,14 @@ namespace Sider
         return this;
       }
 
-      public Builder OverrideSerializer(ISerializer serializer)
+      public Builder OverrideSerializer<T>(ISerializer serializer)
       {
         // can be null
-        _settings.SerializerOverride = serializer;
+        if (_settings.SerializerOverride == null)
+          _settings.SerializerOverride = new Dictionary<Type, ISerializer>();
+        
+        _settings.SerializerOverride.Add(typeof(T), serializer);
+        
         return this;
       }
 

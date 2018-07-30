@@ -41,15 +41,10 @@ namespace Sider
     public RedisClient(RedisSettings settings) :
       base(settings)
     {
-      if (settings.SerializerOverride != null) {
-        _serializer = settings.SerializerOverride as ISerializer<T>;
-        if (_serializer == null)
-          throw new ArgumentException(
-            "Specified serializer is not compatible with type T.");
-      }
-      else
-        _serializer = Serializers.For<T>();
-
+      if (settings.SerializerOverride != null)
+        Serializers.CustomSerializers = settings.SerializerOverride;
+      
+      _serializer = Serializers.For<T>();
       _serializer.Init(Settings);
       _readObj = r => r.ReadSerializedBulk(_serializer);
       _readObjs = r => r.ReadSerializedMultiBulk(_serializer);

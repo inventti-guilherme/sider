@@ -1,18 +1,26 @@
 ﻿
+using System;
+using System.Collections.Generic;
+
 namespace Sider.Serialization
 {
   // TODO: Make public + user configurable
   internal static class Serializers
   {
+    public static Dictionary<Type, ISerializer> CustomSerializers { get; set; }
+    
     public static ISerializer<T> For<T>()
     {
-      if (typeof(T) == typeof(string))
+      Type type = typeof(T);
+      if (CustomSerializers.ContainsKey(type))
+        return (ISerializer<T>)CustomSerializers[type];
+      if (type == typeof(string))
         return (ISerializer<T>)new StringSerializer();
 
-      if (typeof(T) == typeof(byte[]))
+      if (type == typeof(byte[]))
         return (ISerializer<T>)new BufferSerializer();
 
-      return (ISerializer<T>)new ObjectSerializer<T>();
+      return new ObjectSerializer<T>();
     }
   }
 }
